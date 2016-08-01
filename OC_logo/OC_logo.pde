@@ -49,16 +49,51 @@ void draw() {
     //point(x, y);
     ellipse(x, y, 2.5, 2.5);
   }
-  translate(-a,-b/2);
+  translate(0, -b/2);
   noFill();
-  PVector pos = drawCurved("Oberlin College", 1);
-  // green dot to show end of previous one
-  fill(0, 255, 0);
-  ellipse(-a,0,200,200);
-  ellipse(pos.x, pos.y, 500, 500);
+  drawStraight("Oberlin College");
+  //PVector pos = drawCurved("Oberlin College", 1);
+
   //popMatrix();
   noLoop();
 }
+
+void drawStraight(String message) {
+  // a wimpy verisino leaving the letter poitning striaght down
+  PFont theFont = createFont("Arial", 80);
+  textFont(theFont);
+  textAlign(CENTER, CENTER);
+
+  char[] letters = new char[message.length()];
+  //for (int t=0; t<message.length(); t++) {
+  //  letters = append(letters, char(message.charAt(t)));
+  //}
+  float angleStep = 180/(message.length()-1);
+  for (int t=0; t<message.length(); t++) {
+    float theta = radians(t*angleStep-180);
+    pushMatrix();
+    //float x = sin(radians(180-myAng))*a;
+    //float y = cos(radians(180-myAng))*b;
+    float denom = pow(b*cos(theta), 2)+pow(a*sin(theta), 2);
+
+    float r_ = a*b/sqrt(denom);
+    float x = r_*cos(theta);//+centX;
+    float y = r_*sin(theta);//+centY;
+    translate(x, y);
+    println(x);
+    println(y);
+    println();
+    fill(0);
+    stroke(0);
+    strokeWeight(10);
+    text(message.charAt(t), 0, 0);
+    //ellipseMode(CENTER); 
+    stroke(color(0,255,0));
+    point(x,y);
+    ellipse(x, y, 200, 200);
+    popMatrix();
+  }
+};
 PVector drawCurved(String message, int direction) {
 
   PVector returnVector = new PVector();
@@ -89,15 +124,22 @@ PVector drawCurved(String message, int direction) {
 
       // Angle in radians is the arclength divided by the radius
       // Starting on the left side of the circle by adding PI
+
       float theta = PI + arclength / r;
-      float phi = atan(pow(a/b,2)*tan(theta));
+      float denom = pow(b*cos(theta), 2)+pow(a*sin(theta), 2);
+
+      float r_ = a*b/sqrt(denom);
+      float x = r_*cos(theta);//+centX;
+      float y = r_*sin(theta);//+centY;
+      float ang = atan(y/x);
+      if (x>0) ang = atan(-y/x);
       pushMatrix();
 
       // Polar to Cartesian conversion allows us to find the point along the curve. See Chapter 13 for a review of this concept.
-      translate(a*cos(theta), b*sin(theta)); 
+      translate(x, y); 
       // Rotate the box (rotation is offset by 90 degrees)
-      rotate(phi+PI/2); 
-      println(phi);
+      rotate(ang+PI+PI/2); 
+      println(ang+PI+PI/2);
 
       // Display the character
       fill(0);
