@@ -7,7 +7,7 @@ float theta[] ;
 float centX;
 float centY;
 int nTheta = 10000;
-
+float rad = 5;
 PFont f;
 
 
@@ -15,7 +15,7 @@ float textHeight;
 
 
 void setup() {
-  size(1200, 900);
+  size(700, 700);
   f = createFont("Arial", 100);
   textAlign(CENTER, CENTER);
   smooth();
@@ -30,6 +30,7 @@ void setup() {
     theta[i] = (theta_end-theta_start)/nTheta*i;
   }
   stroke(col);
+  fill(col);
 }
 
 float damp(float t, float tau) {
@@ -46,51 +47,59 @@ void draw() {
     r = a*b/sqrt(denom)+4*sin(2*PI*(theta[i]-PI/2)/.08)*damp(theta[i]-PI/5, .05)*10;
     float x = r*cos(theta[i]);//+centX;
     float y = r*sin(theta[i]);//+centY;
-    //point(x, y);
-    ellipse(x, y, 2.5, 2.5);
+    ellipse(x, y, rad, rad);
   }
-  translate(0, -b/2);
+  //translate(0, -b/2);
   noFill();
-  drawStraight("Oberlin College");
+  drawStraight("Oberlin College", true);
+  drawStraight("Physics", false);
+
   //PVector pos = drawCurved("Oberlin College", 1);
 
   //popMatrix();
   noLoop();
 }
 
-void drawStraight(String message) {
+void drawStraight(String message, Boolean up) {
   // a wimpy verisino leaving the letter poitning striaght down
-  PFont theFont = createFont("Arial", 80);
+  PFont theFont = createFont("Ubuntu Medium Italic", 70);
   textFont(theFont);
   textAlign(CENTER, CENTER);
-
-  char[] letters = new char[message.length()];
-  //for (int t=0; t<message.length(); t++) {
-  //  letters = append(letters, char(message.charAt(t)));
-  //}
-  float angleStep = 180/(message.length()-1);
+  float angleSweep = 0;
+  float endAngle = 0;
+  float extraAngle =230;
+  float vPadFactor=1;
+  fill(  #FFC40C);
+  if (up) {
+    angleSweep = 135;
+    endAngle=180;
+    extraAngle = 180;
+    vPadFactor = -1;
+  } else {
+    extraAngle = 0;
+    angleSweep = 110;
+    endAngle =0;
+    message = new StringBuffer(message).reverse().toString();
+    vPadFactor = 1;
+  }
+  float angleStep = angleSweep/(message.length()-1);
   for (int t=0; t<message.length(); t++) {
-    float theta = radians(t*angleStep-180);
+    float theta = radians(t*angleStep+extraAngle+(180-angleSweep)/2);//radians(t*angleStep-(angleSweep+endAngle)/2);
+
     pushMatrix();
-    //float x = sin(radians(180-myAng))*a;
-    //float y = cos(radians(180-myAng))*b;
+
+    float x = 0;
+    float y = 0;
     float denom = pow(b*cos(theta), 2)+pow(a*sin(theta), 2);
 
     float r_ = a*b/sqrt(denom);
-    float x = r_*cos(theta);//+centX;
-    float y = r_*sin(theta);//+centY;
+    x = r_*cos(theta)*1.15;
+    y = r_*sin(theta)+60*vPadFactor;
+
     translate(x, y);
-    println(x);
-    println(y);
-    println();
-    fill(0);
-    stroke(0);
-    strokeWeight(10);
+
     text(message.charAt(t), 0, 0);
-    //ellipseMode(CENTER); 
-    stroke(color(0,255,0));
-    point(x,y);
-    ellipse(x, y, 200, 200);
+
     popMatrix();
   }
 };
