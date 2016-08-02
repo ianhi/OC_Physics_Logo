@@ -9,6 +9,8 @@ float centY;
 int nTheta = 10000;
 float rad = 5;
 PFont f;
+PGraphics pg;
+
 
 
 float textHeight;
@@ -16,6 +18,8 @@ float textHeight;
 
 void setup() {
   size(700, 700);
+  pg = createGraphics(width, height);
+
   f = createFont("Arial", 100);
   textAlign(CENTER, CENTER);
   smooth();
@@ -29,8 +33,8 @@ void setup() {
   for (int i = 0; i<nTheta; i++) {
     theta[i] = (theta_end-theta_start)/nTheta*i;
   }
-  stroke(col);
-  fill(col);
+  pg.stroke(col);
+  pg.fill(col);
 }
 
 float damp(float t, float tau) {
@@ -39,37 +43,44 @@ float damp(float t, float tau) {
 }
 void draw() {
   float r=0;
-  stroke(col);
-  translate(width/2, height/2);
+  pg.beginDraw();
+  //pg.background(0);
+  pg.stroke(col);
+  pg.fill(col);
+  pg.pushMatrix();
+  pg.translate(width/2, height/2);
 
   for (int i = 0; i<nTheta; i++) {
     float denom = pow(b*cos(theta[i]), 2)+pow(a*sin(theta[i]), 2);
     r = a*b/sqrt(denom)+4*sin(2*PI*(theta[i]-PI/2)/.08)*damp(theta[i]-PI/5, .05)*10;
     float x = r*cos(theta[i]);//+centX;
     float y = r*sin(theta[i]);//+centY;
-    ellipse(x, y, rad, rad);
+    pg.ellipse(x, y, rad, rad);
   }
   //translate(0, -b/2);
-  noFill();
+  //pg.noFill();
   drawStraight("Oberlin College", true);
   drawStraight("Physics", false);
 
   //PVector pos = drawCurved("Oberlin College", 1);
+  pg.endDraw();
 
-  //popMatrix();
+  pg.popMatrix();
+  image(pg, 0, 0);
+  pg.save("../logos/transparentProcessing.png");
   noLoop();
 }
 
 void drawStraight(String message, Boolean up) {
   // a wimpy verisino leaving the letter poitning striaght down
   PFont theFont = createFont("Ubuntu Medium Italic", 70);
-  textFont(theFont);
-  textAlign(CENTER, CENTER);
+  pg.textFont(theFont);
+  pg.textAlign(CENTER, CENTER);
   float angleSweep = 0;
   float endAngle = 0;
   float extraAngle =230;
   float vPadFactor=1;
-  fill(  #FFC40C);
+  pg.fill(  #FFC40C);
   if (up) {
     angleSweep = 135;
     endAngle=180;
@@ -86,7 +97,7 @@ void drawStraight(String message, Boolean up) {
   for (int t=0; t<message.length(); t++) {
     float theta = radians(t*angleStep+extraAngle+(180-angleSweep)/2);//radians(t*angleStep-(angleSweep+endAngle)/2);
 
-    pushMatrix();
+    pg.pushMatrix();
 
     float x = 0;
     float y = 0;
@@ -96,11 +107,11 @@ void drawStraight(String message, Boolean up) {
     x = r_*cos(theta)*1.15;
     y = r_*sin(theta)+60*vPadFactor;
 
-    translate(x, y);
+    pg.translate(x, y);
 
-    text(message.charAt(t), 0, 0);
+    pg.text(message.charAt(t), 0, 0);
 
-    popMatrix();
+    pg.popMatrix();
   }
 };
 PVector drawCurved(String message, int direction) {
