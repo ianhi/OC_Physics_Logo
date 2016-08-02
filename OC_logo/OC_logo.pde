@@ -63,6 +63,12 @@ void draw() {
   drawStraight("Physics", false);
 
   //PVector pos = drawCurved("Oberlin College", 1);
+  
+  //Draw a focus
+  float c = sqrt(a*a-b*b);
+  pg.noFill();
+  pg.strokeWeight(5);
+  pg.ellipse(-c,0,60,60);
   pg.endDraw();
 
   pg.popMatrix();
